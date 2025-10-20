@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Slider
 from scipy.integrate import solve_ivp
-from scipy.optimize import fsolve  # Added for Euler backward
+from scipy.optimize import fsolve 
 
 # Definerar konstanter: massor positioner och hastigheter i np arrayer, vektorer
 G = 1.0  # G som 1 hör att göra systemet dimentionslöst
@@ -341,4 +341,5 @@ print(f"Maximum Error (vs reference): {max_error:.2e}")
 print(f"Mean Error (vs reference): {mean_error:.2e}")
 print(f"Time Until Chaotic Divergence (> {threshold}): {chaotic_time:.2f}")
 print("--------------------------\n")
+
 
