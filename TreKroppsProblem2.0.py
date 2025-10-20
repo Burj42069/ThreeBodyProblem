@@ -23,7 +23,7 @@ r2 = np.array([1, 0.0, 0.0])
 r3 = np.array([0.0, 0.0, 0.0])
 R = np.vstack([r1, r2, r3])
 
-omega = np.sqrt(1.0)  # VInkelhastighet, använder inte
+
 v1 = np.array([0.405916, 0.230163, 0.0])
 v2 = np.array([0.405916, 0.230163, 0.0])
 v3 = np.array([-0.811832, -0.460326, 0.0])
@@ -341,5 +341,6 @@ print(f"Maximum Error (vs reference): {max_error:.2e}")
 print(f"Mean Error (vs reference): {mean_error:.2e}")
 print(f"Time Until Chaotic Divergence (> {threshold}): {chaotic_time:.2f}")
 print("--------------------------\n")
+
 
 
