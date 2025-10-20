@@ -23,7 +23,7 @@ r2 = np.array([1, 0.0, 0.0])
 r3 = np.array([0.0, 0.0, 0.0])
 R = np.vstack([r1, r2, r3])
 
-omega = np.sqrt(1.0)  # Angular velocity for m=1, G=1, distance scaled
+omega = np.sqrt(1.0)  # VInkelhastighet, använder inte
 v1 = np.array([0.405916, 0.230163, 0.0])
 v2 = np.array([0.405916, 0.230163, 0.0])
 v3 = np.array([-0.811832, -0.460326, 0.0])
@@ -58,7 +58,7 @@ def pairwise_accel(ri, rj, mj, G=1.0, eps=0):
     dr = rj - ri # Definerar skillnaden mellan rj-ri
     dist2 = np.dot(dr, dr) + eps**2 # Storleken av dr
     inv_dist3 = dist2**(-1.5) # Definerar nämnaren
-    return G * mj * dr * inv_dist3 #Utför beräkningen
+    return G * mj * dr * inv_dist3 # Utför beräkningen
 
 
 def accelerations(R, m, G=1.0, eps=0):
@@ -66,11 +66,11 @@ def accelerations(R, m, G=1.0, eps=0):
     Beräknar parvisa accelerationer av alla kroppar på alla kroppar
     """
     a = np.zeros_like(R) # Definierar tom vektor av samma storlekn som R
-    # on body 1 from 2 and 3
+    # på kropp 1 från 2 och 3
     a[0] = pairwise_accel(R[0], R[1], m[1], G, eps) + pairwise_accel(R[0], R[2], m[2], G, eps)
-    # on body 2 from 1 and 3
+    # på kropp 2 från 1 och 3
     a[1] = pairwise_accel(R[1], R[0], m[0], G, eps) + pairwise_accel(R[1], R[2], m[2], G, eps)
-    # on body 3 from 1 and 2
+    # på kropp 3 från 1 och 2
     a[2] = pairwise_accel(R[2], R[0], m[0], G, eps) + pairwise_accel(R[2], R[1], m[1], G, eps)
     return a
 
@@ -91,7 +91,7 @@ def deriv(t, y, m, G=1.0):
     R = np.vstack([r1, r2, r3])
     a = accelerations(R, m, G)
 
-    # Fill derivatives
+    # Assignar derivator
     dydt[0:3] = v1
     dydt[3:6] = a[0]
     dydt[6:9] = v2
@@ -107,7 +107,7 @@ def deriv(t, y, m, G=1.0):
 # Tidssteg Storlek
 h = 0.01  
 t0 = 0.0  # starttid = 0
-t_max = 100.0      # total simuleringstid
+t_max = 100.0      # total simuleringstid i simulation units [su]
 steps = int(t_max / h) # Summan av totala states i vår burade simulering
 
 
@@ -231,7 +231,7 @@ r2_traj = Y[:, 6:9]     # kropp 2
 r3_traj = Y[:, 12:15]   # kropp 3
 
 
-# Skapa figur och 3D-axel
+# Skapa 3D figur 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
@@ -303,13 +303,11 @@ plt.show()
 
 
 
-# ---------------------------------------------------
-# PERFORMANCE ANALYSIS (common for all methods)
-# ---------------------------------------------------
+# Metrics för mätningar
 
 start_ref = time.time()
 
-# High-accuracy reference solution
+# Teoretiskt perfekt referenslösning med DOP853 metod
 ref_sol = solve_ivp(fun=lambda t, y: deriv(t, y, m, G),
                     t_span=(t0, t_max),
                     y0=y0,
@@ -321,12 +319,12 @@ ref_Y = ref_sol.sol(T).T
 end_ref = time.time()
 ref_time = end_ref - start_ref
 
-# Compute errors (L2 norm of state vector difference)
+# Beräknar fel 
 errors = np.linalg.norm(Y - ref_Y, axis=1)
 max_error = np.max(errors)
 mean_error = np.mean(errors)
 
-# Chaotic divergence threshold
+# Chaotic divergence tidsgräns, storlek på fel 
 threshold = 0.5
 chaotic_idx = np.where(errors > threshold)[0]
 if len(chaotic_idx) > 0:
@@ -334,9 +332,7 @@ if len(chaotic_idx) > 0:
 else:
     chaotic_time = t_max
 
-# ---------------------------------------------------
-# PRINT RESULTS
-# ---------------------------------------------------
+
 print("\n--- Simulation Results ---")
 print(f"Method: CUSTOM STEP FUNCTION")
 print(f"Reference runtime (DOP853): {ref_time:.2f} s")
@@ -345,3 +341,4 @@ print(f"Maximum Error (vs reference): {max_error:.2e}")
 print(f"Mean Error (vs reference): {mean_error:.2e}")
 print(f"Time Until Chaotic Divergence (> {threshold}): {chaotic_time:.2f}")
 print("--------------------------\n")
+
